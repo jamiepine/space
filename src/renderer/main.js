@@ -5,13 +5,31 @@ import App from './App';
 import router from './router';
 import store from './store';
 
+// import '../logic/database/database';
+
+import dao from '../logic/database/dao'
+
+const db = new dao('Core', true);
+db.connect().then(() => {
+  console.log('it worked!')
+  db.newRow('user', {
+    name: 'Jamie',
+    email: 'jamie@notify.me'
+  }).then(() => {
+    console.log('we tried..')
+  })
+
+})
+
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'));
 Vue.http = Vue.prototype.$http = axios;
 Vue.config.productionTip = false;
 
 /* eslint-disable no-new */
 new Vue({
-  components: { App },
+  components: {
+    App
+  },
   router,
   store,
   template: '<App/>',

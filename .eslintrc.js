@@ -8,7 +8,6 @@ module.exports = {
     browser: true,
     node: true
   },
-  extends: 'airbnb-base',
   globals: {
     __static: true
   },
@@ -28,6 +27,7 @@ module.exports = {
     'prefer-template': 0,
     'radix': 0,
     'eqeqeq': 0,
+    'no-plusplus': 0,
     'import/extensions': 0,
     'import/newline-after-import': 0,
     'no-multi-assign': 0,

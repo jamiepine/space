@@ -28,7 +28,7 @@ export default {
         throw error;
       }
 
-      console.log(drives);
+      // console.log(drives);
       this.drives = drives;
     });
   },
