@@ -6,11 +6,11 @@ const Core = require('./models/core.model').default
 
 class database {
 
-    constructor(dbname, memory = false) {
+    constructor(dbName, memory = false) {
 
         // definitions
         this.memory = memory
-        this.dbname = dbname
+        this.dbName = dbName
         this.dbFolderPath = ''
         this.models = {
             Core,
@@ -20,7 +20,7 @@ class database {
             this.dbFolderPath = this.dbFolderPath + '/'
         }
         // combine the name with the path and call the connect method
-        this.dbPath = this.dbFolderPath + this.dbname
+        this.dbPath = this.dbFolderPath + this.dbName
     }
 
     connect() {
@@ -31,7 +31,7 @@ class database {
                     // if no database found, create using model
                     this.createDB().then(resolve).catch(err => reject(err))
                 } else {
-                    console.log('Connected to database')
+                    console.log(`Connected to database: ${this.dbName} via ${this.memory ? 'memory' : 'disk'}.`)
                     if (this.memory) this.createDB()
                     resolve()
                 }
@@ -43,28 +43,35 @@ class database {
     createDB() {
         return new Promise((resolve, reject) => {
             // create the database using model
-            let model = this.models[this.dbname]
+            let model = this.models[this.dbName]
+
             if (!model) return reject('model_not_found');
-            if (!model.tables) return reject('tabels_not_found');
+            if (!model.tables) return reject('tables_not_found');
 
             for (let table of model.tables) {
-                let query = `CREATE TABLE IF NOT EXISTS ${table.name} (`
+
                 let parameters = []
+
+                // begin the query string               
+                let query = `CREATE TABLE IF NOT EXISTS ${table.name} (`
                 for (let column of table.columns) {
+
                     // define the name & type
-                    let param = `${column.name} ${column.type} `
+                    let param = `${column.name} ${column.type}`
+
                     // append any additional options
-                    if (column.primaryKey) param = param + `PRIMARY KEY `
-                    if (column.autoIncrement) param = param + `AUTOINCREMENT `
-                    // remove last space
-                    if (param.slice(param.length - 1, param.length) === ' ') param = param.substring(0, param.length - 1);
+                    if (column.primaryKey) param = param + ` PRIMARY KEY`
+                    if (column.autoIncrement) param = param + ` AUTOINCREMENT`
+                    // push the string to an array
                     parameters.push(param)
                 }
-                query = query + parameters.join(', ') + `)`
-                console.log(query)
-                this.db.serialize(() => {
-                    this.db.run(query)
-                })
+                // convert the array into a string
+                query = query + parameters.join(', ') + `)`;
+
+                console.log(query);
+
+                // run the query
+                this.db.serialize(() => this.db.run(query))
             }
             // this.db.close()
             resolve()
@@ -72,9 +79,8 @@ class database {
     }
 
     newRow(table, template) {
-        console.log('creating new row')
         return new Promise((resolve, reject) => {
-            let model = this.models[this.dbname].tables.find(model => model.name === table)
+            const model = this.models[this.dbName].tables.find(model => model.name === table)
 
             // VALIDATION: iterate over the columns in the model
             for (let column of model.columns) {
@@ -83,7 +89,7 @@ class database {
             }
 
             // VALIDATION: iterate over the properties in the template
-            let keys = Object.keys(template)
+            const keys = Object.keys(template)
             for (let key of keys) {
                 // verify the key exists in the model
                 let column = model.columns.find(column => column.name === key)
@@ -93,14 +99,14 @@ class database {
             }
 
             // parse the template
-            let parsedTemplate = keys.join(', ');
+            const parsedTemplate = keys.join(', ');
             // add a question mark for the values in the query
-            let values = Array.from('?'.repeat(keys.length)).join(',');
+            const values = Array.from('?'.repeat(keys.length)).join(',');
 
             console.log(`INSERT INTO ${table} (${parsedTemplate}) VALUES (${values})`)
 
             this.db.serialize(() => {
-                let query = this.db.prepare(`INSERT INTO ${table} (${parsedTemplate}) VALUES (${values})`);
+                const query = this.db.prepare(`INSERT INTO ${table} (${parsedTemplate}) VALUES (${values})`);
                 console.log(...Object.values(template))
                 query.run(...Object.values(template));
 

@@ -11,13 +11,10 @@ import dao from '../logic/database/dao'
 
 const db = new dao('Core', true);
 db.connect().then(() => {
-  console.log('it worked!')
   db.newRow('user', {
     name: 'Jamie',
     email: 'jamie@notify.me'
-  }).then(() => {
-    console.log('we tried..')
-  })
+  }).then(() => {})
 
 })
 
