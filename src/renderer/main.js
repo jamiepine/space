@@ -9,14 +9,14 @@ import store from './store';
 
 import dao from '../logic/database/dao'
 
-const db = new dao('Core', true);
-db.connect().then(() => {
-  db.newRow('user', {
+const CoreDB = new dao('Core', true);
+CoreDB.connect().then(() => {
+  CoreDB.newRow('user', {
     name: 'Jamie',
     email: 'jamie@notify.me'
-  }).then(() => {})
-
+  }).then()
 })
+
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'));
 Vue.http = Vue.prototype.$http = axios;

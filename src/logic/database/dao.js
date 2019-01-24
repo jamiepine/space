@@ -1,5 +1,6 @@
 const sqlite3 = require('sqlite3')
 const Promise = require('bluebird')
+const nanoid = require('nanoid')
 
 // import models
 const Core = require('./models/core.model').default
@@ -80,7 +81,12 @@ class database {
 
     newRow(table, template) {
         return new Promise((resolve, reject) => {
+            const id = nanoid()
             const model = this.models[this.dbName].tables.find(model => model.name === table)
+
+            // Non negotiable
+            template.id = id
+            template.dateCreated = new Date()
 
             // VALIDATION: iterate over the columns in the model
             for (let column of model.columns) {
@@ -95,7 +101,7 @@ class database {
                 let column = model.columns.find(column => column.name === key)
                 if (!column) return reject(`${key} was not found on model ${model.name}`)
                 // fail if trying to assign primary key
-                if (column.primaryKey) return reject(`Can not assign primary key on model ${model.name}`)
+                // if (column.primaryKey) return reject(`Can not assign primary key on model ${model.name}`)
             }
 
             // parse the template
@@ -103,16 +109,17 @@ class database {
             // add a question mark for the values in the query
             const values = Array.from('?'.repeat(keys.length)).join(',');
 
-            console.log(`INSERT INTO ${table} (${parsedTemplate}) VALUES (${values})`)
-
-            this.db.serialize(() => {
+            this.db.serialize(async () => {
                 const query = this.db.prepare(`INSERT INTO ${table} (${parsedTemplate}) VALUES (${values})`);
                 console.log(...Object.values(template))
                 query.run(...Object.values(template));
 
-                query.finalize();
+                query.finalize(res => {
+                    console.log(this.lastID)
+                });
             });
-            resolve()
+
+            resolve(template)
         })
     }
 }
