@@ -32,14 +32,7 @@ const actions = {
 
 const getters = {
     getThemeName: (state) => state.theme,
-    // returns a string with the styles formmated as CSS inside a :root element
-    getTheme: (state) => {
-        let styles = state.themes[state.theme]
-        let keys = Object.keys(styles)
-        let stylesAsString = `:root {`
-        for (let key of keys) stylesAsString = stylesAsString + `--${key}: ${styles[key]};`
-        return stylesAsString + '}'
-    }
+    getTheme: (state) => state.themes[state.theme]
 };
   
 export default {

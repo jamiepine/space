@@ -21,16 +21,25 @@ export default {
     methods: {
       // this method appends a <style> element with the current theme varibales at the end of the <body>
       initGlobalStyleVariables() {
-        // remove style tag by ID
+        // convert theme object to CSS 
+        let keys = Object.keys(this.getTheme)
+        let stylesAsString = `:root {`
+        for (let key of keys) stylesAsString = stylesAsString + `--${key}: ${this.getTheme[key]};`
+        const css = stylesAsString + '}'
+
+        // remove current style tag from DOM by ID
         let element = document.getElementById('STYLE_VARS');
         if (element) element.parentNode.removeChild(element);
+
         // build element
         let style = document.createElement('style');
         style.type = 'text/css';
         style.id = 'STYLE_VARS';
-        // insert styles as a string from vuex store
-        style.appendChild(document.createTextNode(this.getTheme));
+
+        // insert styles as a string
+        style.appendChild(document.createTextNode(css));
         console.log(style)
+
         // append to body
         document.body.appendChild(style);
       }
