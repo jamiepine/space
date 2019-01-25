@@ -7,6 +7,7 @@ import store from './store';
 
 // import '../logic/database/database';
 
+
 import dao from '../logic/database/dao'
 
 const CoreDB = new dao('Core', true);

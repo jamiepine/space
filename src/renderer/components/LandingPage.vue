@@ -1,6 +1,7 @@
 <template>
   <div id="wrapper">
     <!-- <img id="logo" src="~@/assets/logo.png" alt="electron-vue"> -->
+    <button @click="$store.dispatch('toggleDark')">Toggle theme</button>
     <h1>Drives</h1>
     <main>
       <div class="drives">
@@ -97,7 +98,7 @@ main > div {
   margin-top: 10px;
   .drive {
     border-radius: 5px;
-    background: #f5f5f5;
+    background: var(--sidebar);
     height: 150px;
     min-width: 100px;
     margin-right: 10px;
